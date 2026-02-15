@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Ticket | MyTickitSpot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body{margin:0;font-family:Arial,sans-serif;background:#f4f6fb;}
+    .container{max-width:420px;margin:50px auto;background:#fff;padding:25px;border-radius:10px;box-shadow:0 8px 25px rgba(0,0,0,0.1);}
+    h2{color:#111827;margin-bottom:10px;}
+    input, select{width:100%;padding:10px;margin:8px 0;border-radius:5px;border:1px solid #ccc;font-size:14px;}
+    .btn{padding:10px;background:#4f46e5;color:#fff;border:none;border-radius:5px;cursor:pointer;width:100%;}
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Book Ticket</h2>
+  <p id="eventName"></p>
+  <p>Price per ticket: ₹<span id="eventPrice"></span></p>
+
+  <input type="number" id="ticketQty" placeholder="Number of Tickets" min="1">
+  <p>Total: ₹<span id="totalPrice">0</span></p>
+
+  <button class="btn" onclick="confirmPayment()">Pay & Book</button>
+</div>
+
+<script>
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if(!user || user.role !== "attendee") window.location.href = "login.html";
+
+  const eventId = localStorage.getItem("bookingEventId");
+  const eventsDB = JSON.parse(localStorage.getItem("eventsDB")) || [
+    {id:1,name:"Concert Night",vendor:"ABC Events",date:"15 Feb 2026",price:1200,available:50},
+    {id:2,name:"Movie Premiere",vendor:"XYZ Cinema",date:"18 Feb 2026",price:450,available:100},
+    {id:3,name:"Goa Trip",vendor:"Travel Fun",date:"25 Feb 2026",price:5000,available:20}
+  ];
+
+  const event = eventsDB.find(ev => ev.id == eventId);
+  document.getElementById("eventName").innerText = `${event.name} by ${event.vendor} on ${event.date}`;
+  document.getElementById("eventPrice").innerText = event.price;
+
+  document.getElementById("ticketQty").addEventListener("input", function(){
+    const qty = parseInt(this.value) || 0;
+    document.getElementById("totalPrice").innerText = qty * event.price;
+  });
+
+  function confirmPayment(){
+    const qty = parseInt(document.getElementById("ticketQty").value);
+    if(!qty || qty > event.available){
+      alert("Enter valid number of tickets.");
+      return;
+    }
+
+    const total = qty * event.price;
+
+    // Save booking
+    const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    const bookingId = "MTS-" + Date.now();
+    bookings.push({
+      bookingId,
+      eventName: event.name,
+      vendor: event.vendor,
+      attendee: user.name,
+      email: user.email,
+      qty,
+      total
+    });
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+
+    // Reduce available tickets
+    event.available -= qty;
+    localStorage.setItem("eventsDB", JSON.stringify(eventsDB));
+
+    // Redirect to ticket
+    localStorage.setItem("lastBookingId", bookingId);
+    window.location.href = "ticket.html";
+  }
+</script>
+
+</body>
+</html>

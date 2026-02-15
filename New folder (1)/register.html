@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Account | MyTicketSpot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" href="style.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ========== REGISTER SPECIFIC STYLES ========== */
+    /* Matches login.html exactly for consistency */
+    
+    body {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px; /* Prevent edge touching on mobile */
+    }
+
+    .register-container {
+        width: 100%;
+        max-width: 450px; /* Slightly wider than login for extra fields */
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .brand-logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--dark-bg);
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .register-header h2 {
+        font-size: 1.4rem;
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 25px;
+    }
+
+    /* Input Styling Reused */
+    .input-group {
+        position: relative;
+        margin-bottom: 18px;
+        text-align: left;
+    }
+
+    .input-group label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--text-dark);
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i.field-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        pointer-events: none; /* Allows click through to select */
+    }
+
+    .input-wrapper input, 
+    .input-wrapper select {
+        width: 100%;
+        padding: 12px 12px 12px 45px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        outline: none;
+        transition: 0.3s;
+        background: #f8fafc;
+        appearance: none; /* Removes default arrow on select */
+    }
+
+    /* Custom Arrow for Select Box */
+    .select-arrow {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        pointer-events: none;
+        font-size: 0.8rem;
+    }
+
+    .input-wrapper input:focus,
+    .input-wrapper select:focus {
+        border-color: var(--primary-color);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #94a3b8;
+    }
+
+    .btn-register {
+        width: 100%;
+        padding: 14px;
+        background: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 15px;
+    }
+
+    .btn-register:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+
+    .form-footer {
+        margin-top: 25px;
+        font-size: 0.9rem;
+        color: var(--text-light);
+    }
+
+    .form-footer a {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    /* Feedback Messages */
+    .msg-box {
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 6px;
+        display: none;
+        text-align: left;
+    }
+    .error { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+    .success { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; }
+
+  </style>
+</head>
+<body>
+
+<div class="register-container">
+  
+  <div class="register-header">
+    <span class="brand-logo"><i class="fa-solid fa-ticket"></i> MyTicketSpot</span>
+    <h2>Start using MyTicketSpot Today</h2>
+  </div>
+
+  <div id="msg-box" class="msg-box"></div>
+
+  <div class="input-group">
+    <label for="name">Full Name</label>
+    <div class="input-wrapper">
+      <i class="fa-solid fa-user field-icon"></i>
+      <input type="text" id="name" placeholder="John Doe" required>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label for="email">Email Address</label>
+    <div class="input-wrapper">
+      <i class="fa-solid fa-envelope field-icon"></i>
+      <input type="email" id="email" placeholder="name@company.com" required>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label for="password">Password</label>
+    <div class="input-wrapper">
+      <i class="fa-solid fa-lock field-icon"></i>
+      <input type="password" id="password" placeholder="Create a password" required>
+      <i class="fa-solid fa-eye toggle-password" id="togglePassword" onclick="togglePass()"></i>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label for="role">I am a...</label>
+    <div class="input-wrapper">
+      <i class="fa-solid fa-briefcase field-icon"></i>
+      <select id="role">
+        <option value="" disabled selected>Select your role</option>
+        <option value="attendee">Attendee (I want to buy tickets)</option>
+        <option value="vendor">Vendor (I want to organize events)</option>
+      </select>
+      <i class="fa-solid fa-chevron-down select-arrow"></i>
+    </div>
+  </div>
+
+  <button class="btn-register" onclick="registerUser()">Create Account</button>
+
+  <div class="form-footer">
+    <p>Already have an account? <a href="login.html">Log In</a></p>
+  </div>
+
+</div>
+
+<script>
+  function togglePass() {
+    const passwordInput = document.getElementById("password");
+    const icon = document.getElementById("togglePassword");
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      passwordInput.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  }
+
+  function registerUser() {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
+    
+    const msgBox = document.getElementById("msg-box");
+    const btn = document.querySelector(".btn-register");
+
+    // Clear previous messages
+    msgBox.style.display = "none";
+    msgBox.className = "msg-box"; // reset classes
+
+    // 1. Validation
+    if(!name || !email || !password || !role){
+      showMessage("Please fill in all fields.", "error");
+      return;
+    }
+
+    if(password.length < 6){
+        showMessage("Password must be at least 6 characters.", "error");
+        return;
+    }
+
+    // 2. Database Logic
+    let users = JSON.parse(localStorage.getItem("usersDB")) || [];
+
+    // Check Duplicate
+    if(users.find(u => u.email === email)){
+      showMessage("This email is already registered.", "error");
+      return;
+    }
+
+    // 3. Save User
+    // Simulate API Call visual effect
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Creating...';
+    btn.style.opacity = "0.8";
+
+    setTimeout(() => {
+        users.push({name, email, password, role});
+        localStorage.setItem("usersDB", JSON.stringify(users));
+
+        showMessage("Registration successful! Redirecting...", "success");
+        
+        // Redirect after short delay
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1500);
+    }, 1000);
+  }
+
+  function showMessage(text, type) {
+    const msgBox = document.getElementById("msg-box");
+    msgBox.innerText = text;
+    msgBox.classList.add(type);
+    msgBox.style.display = "block";
+  }
+</script>
+
+</body>
+</html>

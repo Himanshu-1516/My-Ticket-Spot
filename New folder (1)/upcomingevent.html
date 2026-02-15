@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Events | NexusEvents</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { 
+            --primary: #E23744; 
+            --dark: #111827;
+            --text-main: #374151;
+            --text-light: #6B7280;
+            --bg-body: #FFFFFF;
+            --bg-alt: #F9FAFB;
+            --border: #E5E7EB;
+            --radius: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.5; padding-top: 72px; }
+
+        /* --- Professional Navbar --- */
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 6%; height: 72px; position: fixed; width: 100%; top: 0; 
+            z-index: 1000; background: #ffffff; border-bottom: 1px solid var(--border);
+        }
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--dark); text-decoration: none; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .logo i { color: var(--primary); }
+        .logo span { color: var(--primary); }
+        
+        nav { display: flex; gap: 30px; } 
+        nav a { font-weight: 500; font-size: 0.9rem; text-decoration: none; color: var(--text-main); transition: 0.2s; } 
+        nav a:hover, nav a.active { color: var(--primary); }
+
+        /* --- Sticky Professional Filter Bar --- */
+        .filter-wrapper {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 72px;
+            z-index: 999;
+            padding: 14px 6%;
+        }
+
+        .filter-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .filter-scroll::-webkit-scrollbar { display: none; }
+
+        .filter-pill {
+            padding: 8px 18px;
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-main);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .filter-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-pill:hover:not(.active) { background: var(--bg-alt); border-color: #D1D5DB; }
+
+        /* --- Main Layout --- */
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px 6%; }
+
+        .events-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; 
+        }
+
+        @media (min-width: 768px) { .events-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
+        @media (min-width: 1024px) { .events-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 1200px) { .events-grid { grid-template-columns: repeat(5, 1fr); } }
+
+        /* --- THE EQUAL CARD DESIGN --- */
+        .event-card {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .event-card:hover { transform: translateY(-5px); }
+
+        /* Forced Equal Aspect Ratio */
+        .image-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 2 / 3; /* Matches Activity Design */
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: #F3F4F6;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures no distortion */
+            transition: 0.5s ease;
+        }
+        .event-card:hover .image-container img { transform: scale(1.05); }
+
+        /* Dark Badge for Date (matches Activity Design) */
+        .date-badge {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 8px 12px;
+            font-weight: 500;
+        }
+
+        .category-tag {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Content Styling */
+        .event-info { display: flex; flex-direction: column; gap: 4px; }
+        
+        .event-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark);
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 2px;
+        }
+
+        .event-venue {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .event-available {
+            font-size: 0.75rem;
+            color: #10B981; /* Green for availability */
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .event-price {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-top: 8px;
+        }
+
+        .no-events {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 100px 20px;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-ticket-alt"></i> MyTicket<span>Spot</span></a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="#" class="active">Explore</a>
+            <a href="vendor-dashboard.html">List Events</a>
+        </nav>
+    </header>
+
+    <div class="filter-wrapper">
+        <div class="filter-scroll" id="filter-bar">
+            <div class="filter-pill active" onclick="filterEvents('all', this)">All Events</div>
+            <div class="filter-pill" onclick="filterEvents('Movies', this)">Movies</div>
+            <div class="filter-pill" onclick="filterEvents('Comedy', this)">Comedy</div>
+            <div class="filter-pill" onclick="filterEvents('Music', this)">Music</div>
+            <div class="filter-pill" onclick="filterEvents('Workshops', this)">Workshops</div>
+            <div class="filter-pill" onclick="filterEvents('Sports', this)">Sports</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="events-grid" id="eventsGrid">
+            </div>
+    </div>
+
+    <script>
+        function loadEvents(categoryFilter = 'all') {
+            const grid = document.getElementById('eventsGrid');
+            const eventsDB = JSON.parse(localStorage.getItem('eventsDB')) || [];
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Filter by date (Upcoming) and Category
+            let filtered = eventsDB.filter(event => new Date(event.date) >= today);
+            
+            if (categoryFilter !== 'all') {
+                filtered = filtered.filter(event => event.category === categoryFilter);
+            }
+
+            // Sort by nearest date
+            filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-events">
+                        <i class="far fa-calendar-times" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                        <h3>No upcoming events found</h3>
+                        <p>Try selecting a different category or check back later.</p>
+                    </div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(event => `
+                <div class="event-card" onclick="alert('Proceeding to book: ${event.title}')">
+                    <div class="image-container">
+                        <span class="category-tag">${event.category}</span>
+                        <img src="${event.img}" onerror="this.src='https://placehold.co/400x600?text=Event+Image'">
+                        <div class="date-badge">
+                            <i class="far fa-calendar-alt"></i> 
+                            ${new Date(event.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                        </div>
+                    </div>
+                    <div class="event-info">
+                        <div class="event-title">${event.title}</div>
+                        <div class="event-venue"><i class="fas fa-map-marker-alt" style="font-size: 0.7rem;"></i> ${event.venue || 'Online'}</div>
+                        <div class="event-available">${event.available} tickets available</div>
+                        <div class="event-price">₹${event.price} <span style="font-size: 0.7rem; font-weight: 400; color: var(--text-light);">onwards</span></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterEvents(category, btn) {
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            loadEvents(category);
+        }
+
+        window.onload = () => loadEvents();
+    </script>
+</body>
+</html>

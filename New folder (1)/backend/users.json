@@ -1,0 +1,12 @@
+[
+  {
+    "email": "admin@mytickitspot.com",
+    "password": "admin123",
+    "role": "admin"
+  },
+  {
+    "email": "vendor@mytickitspot.com",
+    "password": "vendor123",
+    "role": "vendor"
+  }
+]

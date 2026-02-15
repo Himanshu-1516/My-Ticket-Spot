@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Attendee Dashboard | MyTickitSpot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { margin:0; font-family: Arial,sans-serif; background:#f4f6fb; }
+    .sidebar { width: 230px; height:100vh; background:#111827; position:fixed; color:#fff; padding:20px;}
+    .sidebar h2 { text-align:center; margin-bottom:30px;}
+    .sidebar a { display:block; color:#c7d2fe; text-decoration:none; padding:12px; border-radius:6px; margin-bottom:10px; font-size:14px;}
+    .sidebar a:hover, .sidebar a.active { background:#1f2937; color:#fff;}
+    .main { margin-left:250px; padding:25px;}
+    h1 { margin-bottom:20px;}
+    table { width:100%; background:#fff; border-collapse: collapse; border-radius:10px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.08);}
+    th,td { padding:14px; border-bottom:1px solid #eee; font-size:14px; text-align:left;}
+    th { background:#f1f5f9; }
+    .btn { padding:6px 10px; border:none; border-radius:4px; font-size:12px; cursor:pointer; background:#4f46e5; color:#fff;}
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h2>🎟 Attendee</h2>
+  <a href="attendee-dashboard.html" class="active">Dashboard</a>
+  <a href="my-bookings.html">My Bookings</a>
+  <a href="billing.html">Billing</a>
+  <a href="#" onclick="logout()">Logout</a>
+</div>
+
+<div class="main">
+  <h1>Welcome, <span id="attendeeName"></span></h1>
+  
+  <h2>Available Events / Tickets</h2>
+  <table id="eventsTable">
+    <tr>
+      <th>Event Name</th>
+      <th>Vendor</th>
+      <th>Date</th>
+      <th>Price</th>
+      <th>Available Tickets</th>
+      <th>Action</th>
+    </tr>
+  </table>
+</div>
+<div id="availableEvents">
+  <!-- Vendor events will load here -->
+</div>
+
+<script>
+// Get all events
+const eventsDB = JSON.parse(localStorage.getItem("eventsDB")) || [];
+const availableDiv = document.getElementById("availableEvents");
+
+eventsDB.forEach(ev => {
+  const div = document.createElement("div");
+  div.classList.add("card");
+  div.innerHTML = `
+    <h3>${ev.name}</h3>
+    <p>Date: ${ev.date}</p>
+    <p>Price: ₹${ev.price}</p>
+    <p>Tickets Available: ${ev.available}</p>
+    <button onclick="bookEvent(${ev.id})">Book Now</button>
+  `;
+  availableDiv.appendChild(div);
+});
+
+function bookEvent(id){
+  const event = eventsDB.find(ev=>ev.id === id);
+  localStorage.setItem("selectedEvent", JSON.stringify(event));
+  window.location.href = "guest-details.html";
+}
+
+  // SECURITY CHECK
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if(!user || user.role !== "attendee") window.location.href = "login.html";
+  document.getElementById("attendeeName").innerText = user.name;
+
+  const table = document.getElementById("eventsTable");
+  eventsDB.forEach(ev => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${ev.name}</td>
+      <td>${ev.vendor}</td>
+      <td>${ev.date}</td>
+      <td>₹${ev.price}</td>
+      <td>${ev.available}</td>
+      <td><button class="btn" onclick="bookTicket(${ev.id})">Book Now</button></td>
+    `;
+    table.appendChild(tr);
+  });
+
+  function bookTicket(eventId){
+    localStorage.setItem("bookingEventId", eventId);
+    window.location.href = "booking.html";
+  }
+
+  function logout(){
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
+  }
+</script>
+
+</body>
+</html>

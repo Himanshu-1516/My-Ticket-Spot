@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment | MyTicketSpot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #E23744;
+      --primary-hover: #d0303d;
+      --surface: #ffffff;
+      --background: #f1f5f9;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text-main);
+    }
+
+    .payment-card {
+      background: var(--surface);
+      width: 100%;
+      max-width: 480px;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Stepper */
+    .stepper {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-bottom: 35px;
+    }
+    .stepper::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--border);
+      z-index: 0;
+    }
+    .step {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 33.33%;
+    }
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+    .step.active .step-circle {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+    .step.completed .step-circle {
+      border-color: var(--success);
+      background: var(--success);
+      color: white;
+    }
+    .step-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+    .step.active .step-label { color: var(--primary); }
+
+    /* Summary Receipt Box */
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+
+    .summary-header {
+      border-bottom: 2px dashed var(--border);
+      padding-bottom: 15px;
+      margin-bottom: 15px;
+    }
+
+    .event-title { 
+      font-size: 1.1rem; 
+      font-weight: 700; 
+      margin-bottom: 4px; 
+      color: var(--primary);
+    }
+    .customer-name { 
+      font-size: 0.9rem; 
+      color: var(--text-muted); 
+    }
+    .booking-details {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .cost-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      padding: 6px 0;
+    }
+
+    .cost-row.highlight {
+      background: #ffebee;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid var(--border);
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: var(--primary);
+    }
+
+    /* Payment Method Selector */
+    .payment-title { 
+      font-size: 1rem; 
+      font-weight: 600; 
+      margin-bottom: 15px; 
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .payment-method {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .payment-method:hover { 
+      border-color: #cbd5e1; 
+      background: #fafafa; 
+    }
+
+    /* Hidden Radio Logic */
+    .payment-method input[type="radio"] {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      margin-right: 15px;
+      display: grid;
+      place-content: center;
+    }
+
+    .payment-method input[type="radio"]::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      transform: scale(0);
+      transition: 0.2s transform ease-in-out;
+      background-color: var(--primary);
+    }
+
+    /* Selected State */
+    .payment-method:has(input:checked) {
+      border-color: var(--primary);
+      background: #ffebee;
+    }
+    
+    .payment-method input:checked { border-color: var(--primary); }
+    .payment-method input:checked::before { transform: scale(1); }
+
+    .method-info { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      flex-grow: 1; 
+    }
+    .method-icons { 
+      display: flex; 
+      gap: 5px; 
+      color: var(--text-muted); 
+      font-size: 1.2rem; 
+    }
+
+    /* Pay Button */
+    .btn-pay {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-pay:hover { 
+      background: var(--primary-hover); 
+      transform: translateY(-1px); 
+    }
+    .btn-pay:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .btn-pay:disabled:hover {
+      transform: none;
+      background: #9ca3af;
+    }
+
+    .secure-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Loading and Error States */
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+    }
+
+    .loading i {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .error-message {
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      color: #dc2626;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      display: none;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Seat Details */
+    .seat-details {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 0.85rem;
+    }
+
+    .seat-type {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #dcfce7;
+    }
+
+    .seat-type:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    
+    /* Ticket QR Preview */
+    .qr-preview {
+      text-align: center;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 12px;
+      margin: 20px 0;
+      border: 2px dashed #e2e8f0;
+    }
+    
+    .qr-code {
+      width: 120px;
+      height: 120px;
+      background: #333;
+      margin: 0 auto 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="payment-card">
+  <!-- Back Link -->
+  <a href="guest-details.html" class="back-link">
+    <i class="fa-solid fa-arrow-left"></i> Back to Guest Details
+  </a>
+
+  <!-- Error Message -->
+  <div class="error-message" id="errorMessage">
+    <i class="fa-solid fa-exclamation-circle"></i>
+    <span id="errorText">Unable to load booking details. Please try again.</span>
+  </div>
+
+  <div class="stepper">
+    <div class="step completed">
+      <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+      <div class="step-label">Seats</div>
+    </div>
+    <div class="step completed">
+      <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+      <div class="step-label">Details</div>
+    </div>
+    <div class="step active">
+      <div class="step-circle">3</div>
+      <div class="step-label">Payment</div>
+    </div>
+  </div>
+
+  <h2 style="margin-bottom: 20px; font-size: 1.5rem;">Review & Pay</h2>
+
+  <!-- Loading State -->
+  <div class="loading" id="loadingSummary">
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <p>Loading booking details...</p>
+  </div>
+
+  <!-- Booking Summary -->
+  <div class="summary-box" id="summaryBox" style="display: none;">
+    <div class="summary-header">
+      <div class="event-title" id="eventName">Loading Event...</div>
+      <div class="customer-name" id="userName">Guest User</div>
+      <div class="booking-details" id="bookingDetails">
+        <span id="venueName">Loading...</span>
+        <span id="showDateTime">Loading...</span>
+        <span id="seatInfo">Loading...</span>
+      </div>
+    </div>
+    
+    <!-- Seat Breakdown -->
+    <div id="seatBreakdown"></div>
+
+    <!-- Cost Breakdown (simplified for compatibility) -->
+    <div class="cost-row highlight" id="totalOnlyRow">
+      <span>Total Amount</span>
+      <span>₹<span id="totalAmount">0</span></span>
+    </div>
+    
+    <!-- QR Preview -->
+    <div class="qr-preview">
+      <div class="qr-code" id="qrCode">
+        <i class="fa-solid fa-qrcode fa-2x"></i>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">
+        Your ticket QR code will be generated after payment
+      </p>
+    </div>
+    
+    <!-- Payment Method Section -->
+    <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed var(--border);">
+      <div class="payment-title">
+        <i class="fa-solid fa-credit-card"></i>
+        Select Payment Method
+      </div>
+
+      <label class="payment-method">
+        <div class="method-info">
+          <input type="radio" name="payment" value="upi" checked>
+          <i class="fa-solid fa-mobile-screen-button" style="color:var(--primary);"></i>
+          <span style="font-weight:500;">UPI / Wallets</span>
+        </div>
+        <div class="method-icons">
+          <i class="fa-brands fa-google-pay"></i>
+          <i class="fa-brands fa-amazon-pay"></i>
+          <i class="fa-brands fa-paypal"></i>
+        </div>
+      </label>
+
+      <label class="payment-method">
+        <div class="method-info">
+          <input type="radio" name="payment" value="card">
+          <i class="fa-regular fa-credit-card" style="color:var(--primary);"></i>
+          <span style="font-weight:500;">Credit / Debit Card</span>
+        </div>
+        <div class="method-icons">
+          <i class="fa-brands fa-cc-visa"></i>
+          <i class="fa-brands fa-cc-mastercard"></i>
+          <i class="fa-brands fa-cc-amex"></i>
+        </div>
+      </label>
+
+      <label class="payment-method">
+        <div class="method-info">
+          <input type="radio" name="payment" value="netbanking">
+          <i class="fa-solid fa-building-columns" style="color:var(--primary);"></i>
+          <span style="font-weight:500;">Net Banking</span>
+        </div>
+        <div class="method-icons">
+          <i class="fa-solid fa-university"></i>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Pay Button -->
+  <button onclick="processPayment()" class="btn-pay" id="payBtn" disabled>
+    <i class="fa-solid fa-lock"></i>
+    Pay ₹<span id="btnTotal">0</span>
+  </button>
+
+  <div class="secure-note">
+    <i class="fa-solid fa-lock" style="color: var(--success);"></i>
+    Payments are SSL encrypted and secure. Your payment details are never stored.
+  </div>
+</div>
+
+<script>
+// ============================================
+// Universal Booking Data Loader (works for all flows)
+// ============================================
+
+function loadBookingData() {
+  try {
+    // Try keys in order: currentOrder (set by guest-details), currentBooking, selectedEvent
+    const possibleKeys = ['currentOrder', 'currentBooking', 'selectedEvent', 'currentMovieBooking'];
+    let booking = null;
+
+    for (const key of possibleKeys) {
+      const data = localStorage.getItem(key);
+      if (data) {
+        try {
+          booking = JSON.parse(data);
+          if (booking && (booking.eventTitle || booking.movieTitle || booking.show)) break;
+        } catch (e) {
+          console.warn(`Error parsing ${key}:`, e);
+        }
+      }
+    }
+
+    // If still not found, try constructing from individual keys (fallback for movies)
+    if (!booking) {
+      const eventName = localStorage.getItem('eventName');
+      if (eventName) {
+        booking = {
+          eventTitle: eventName,
+          venue: localStorage.getItem('cinemaName') || localStorage.getItem('venue') || 'Venue',
+          eventDate: localStorage.getItem('showDateTime')?.split(', ')[0] || 'Today',
+          eventTime: localStorage.getItem('showDateTime')?.split(', ')[1] || '08:00 PM',
+          seats: localStorage.getItem('seatNumbers') || JSON.parse(localStorage.getItem('selectedSeats') || '[]').join(', ') || 'General Access',
+          totalAmount: parseInt(localStorage.getItem('totalPrice') || 0),
+          eventType: localStorage.getItem('eventType') || 'movie'
+        };
+      }
+    }
+
+    if (!booking) {
+      showError('No booking found. Please go back and select seats.');
+      return null;
+    }
+
+    // Normalize booking object
+    return normalizeBooking(booking);
+  } catch (error) {
+    console.error('Error loading booking:', error);
+    showError('Error loading booking details. Please try again.');
+    return null;
+  }
+}
+
+function normalizeBooking(booking) {
+  const normalized = { ...booking };
+
+  // Handle movie structure
+  if (booking.movieTitle && !booking.eventTitle) {
+    normalized.eventTitle = booking.movieTitle;
+    normalized.eventType = 'movie';
+  }
+  if (booking.cinemaName && !booking.venue) {
+    normalized.venue = booking.cinemaName;
+  }
+  if (booking.showDate && !booking.eventDate) {
+    normalized.eventDate = booking.showDate;
+  }
+  if (booking.showTime && !booking.eventTime) {
+    normalized.eventTime = booking.showTime;
+  }
+  if (booking.seatNumbers && !booking.seats) {
+    normalized.seats = booking.seatNumbers;
+  }
+  if (booking.totalPrice && !booking.totalAmount) {
+    normalized.totalAmount = booking.totalPrice;
+  }
+
+  // Handle event with show object
+  if (booking.show && typeof booking.show === 'object') {
+    normalized.eventTitle = booking.show.title || booking.eventTitle;
+    normalized.venue = booking.show.venue || booking.venue;
+    normalized.eventDate = booking.show.date || booking.eventDate;
+    normalized.eventTime = booking.show.time || booking.eventTime;
+  }
+
+  // Ensure totalAmount is a number
+  normalized.totalAmount = parseInt(normalized.totalAmount || 0);
+
+  // If seats is array, join; if string, keep
+  if (Array.isArray(normalized.seats)) {
+    normalized.seats = normalized.seats.join(', ');
+  } else if (!normalized.seats) {
+    normalized.seats = 'General Access';
+  }
+
+  return normalized;
+}
+
+function loadGuestDetails() {
+  // First try to get from booking object (guestDetails property)
+  const booking = JSON.parse(localStorage.getItem('currentOrder') || '{}');
+  if (booking.guestName || booking.guestEmail || booking.guestPhone) {
+    return {
+      name: booking.guestName || 'Guest',
+      email: booking.guestEmail || 'guest@example.com',
+      phone: booking.guestPhone || '+91 00000 00000'
+    };
+  }
+
+  // Otherwise try individual localStorage items
+  return {
+    name: localStorage.getItem('userName') || 'Guest User',
+    email: localStorage.getItem('userEmail') || 'guest@example.com',
+    phone: localStorage.getItem('userPhone') || '+91 00000 00000'
+  };
+}
+
+function formatPrice(price) {
+  return parseInt(price).toLocaleString('en-IN');
+}
+
+function showError(message) {
+  document.getElementById('errorText').textContent = message;
+  document.getElementById('errorMessage').style.display = 'block';
+  document.getElementById('loadingSummary').style.display = 'none';
+  document.getElementById('payBtn').disabled = true;
+}
+
+function generateSeatBreakdownIfAvailable(booking) {
+  // If we have seatDetails array (from movie flow), show breakdown
+  if (booking.seatDetails && Array.isArray(booking.seatDetails) && booking.seatDetails.length > 0) {
+    const seatsByCat = {};
+    booking.seatDetails.forEach(seat => {
+      const cat = seat.categoryName || 'General';
+      if (!seatsByCat[cat]) seatsByCat[cat] = [];
+      seatsByCat[cat].push(seat);
+    });
+
+    let html = '<div class="seat-details">';
+    Object.entries(seatsByCat).forEach(([cat, seats]) => {
+      const price = seats[0].price || 0;
+      const total = seats.length * price;
+      html += `
+        <div class="seat-type">
+          <span>${cat} Seats (₹${price} each)</span>
+          <span>${seats.length} × ₹${price} = ₹${total}</span>
+        </div>
+      `;
+    });
+    html += '</div>';
+    return html;
+  } else if (booking.seats && typeof booking.seats === 'string') {
+    // Just show the seat numbers
+    return `<div class="seat-details"><div class="seat-type"><span>Selected Seats</span><span>${booking.seats}</span></div></div>`;
+  }
+  return ''; // No breakdown
+}
+
+function updatePaymentUI(booking, guest) {
+  // Basic info
+  document.getElementById('eventName').textContent = booking.eventTitle || 'Event';
+  document.getElementById('userName').textContent = guest.name || 'Guest';
+  document.getElementById('venueName').textContent = booking.venue || 'Venue';
+  
+  // Date/time
+  const dateTime = booking.eventDate && booking.eventTime 
+    ? `${booking.eventDate} • ${booking.eventTime}`
+    : (booking.eventDate || booking.eventTime || 'Date & time TBA');
+  document.getElementById('showDateTime').textContent = dateTime;
+
+  // Seats
+  document.getElementById('seatInfo').textContent = `Seats: ${booking.seats || 'Not selected'}`;
+
+  // Seat breakdown if available
+  const seatBreakdown = generateSeatBreakdownIfAvailable(booking);
+  document.getElementById('seatBreakdown').innerHTML = seatBreakdown;
+
+  // Total amount
+  const total = booking.totalAmount || 0;
+  document.getElementById('totalAmount').textContent = formatPrice(total);
+  document.getElementById('btnTotal').textContent = formatPrice(total);
+
+  // Save enriched booking for payment processing
+  booking.guestDetails = guest;
+  booking.bookingId = booking.bookingId || 'MTS-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+  localStorage.setItem('currentOrder', JSON.stringify(booking)); // ensure it's saved
+
+  // Hide loading, show content
+  document.getElementById('loadingSummary').style.display = 'none';
+  document.getElementById('summaryBox').style.display = 'block';
+  document.getElementById('payBtn').disabled = false;
+
+  // Highlight first payment method
+  const firstMethod = document.querySelector('.payment-method');
+  if (firstMethod) {
+    firstMethod.style.borderColor = 'var(--primary)';
+    firstMethod.style.background = '#ffebee';
+  }
+}
+
+// ============================================
+// Initialization
+// ============================================
+window.addEventListener('load', function() {
+  const booking = loadBookingData();
+  if (!booking) return;
+
+  const guest = loadGuestDetails();
+  updatePaymentUI(booking, guest);
+});
+
+// ============================================
+// Payment Processing
+// ============================================
+async function processPayment() {
+  const payBtn = document.getElementById('payBtn');
+  const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+  const booking = JSON.parse(localStorage.getItem('currentOrder'));
+  if (!booking) {
+    showError('Booking data missing. Please restart.');
+    return;
+  }
+
+  // Simulate processing
+  payBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+  payBtn.disabled = true;
+
+  try {
+    // Add payment details
+    booking.paymentMethod = paymentMethod;
+    booking.paymentStatus = 'completed';
+    booking.paymentDate = new Date().toISOString();
+    booking.paymentId = 'PAY-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+    localStorage.setItem('currentOrder', JSON.stringify(booking));
+
+    // Add to history
+    const history = JSON.parse(localStorage.getItem('bookingHistory') || '[]');
+    history.push(booking);
+    localStorage.setItem('bookingHistory', JSON.stringify(history));
+
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Show success
+    payBtn.innerHTML = '<i class="fa-solid fa-check"></i> Payment Successful!';
+    payBtn.style.background = 'var(--success)';
+
+    // Generate QR preview
+    document.getElementById('qrCode').innerHTML = `
+      <div style="text-align: center; color: white;">
+        <div style="font-size: 0.6rem; margin-bottom: 5px;">TICKET ID</div>
+        <div style="font-weight: bold; font-size: 0.8rem;">${booking.bookingId}</div>
+      </div>
+    `;
+
+    // Redirect to ticket page
+    setTimeout(() => {
+      window.location.href = 'ticket.html?bookingId=' + booking.bookingId;
+    }, 1500);
+  } catch (error) {
+    console.error('Payment error:', error);
+    payBtn.innerHTML = '<i class="fa-solid fa-exclamation-circle"></i> Payment Failed';
+    payBtn.style.background = 'var(--danger)';
+    showError('Payment failed. Please try again.');
+
+    setTimeout(() => {
+      payBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Pay ₹' + document.getElementById('btnTotal').textContent;
+      payBtn.disabled = false;
+      payBtn.style.background = 'var(--primary)';
+    }, 3000);
+  }
+}
+
+// Handle payment method selection highlight
+document.querySelectorAll('.payment-method input').forEach(radio => {
+  radio.addEventListener('change', function() {
+    document.querySelectorAll('.payment-method').forEach(m => {
+      m.style.borderColor = 'var(--border)';
+      m.style.background = 'white';
+    });
+    const parent = this.closest('.payment-method');
+    parent.style.borderColor = 'var(--primary)';
+    parent.style.background = '#ffebee';
+  });
+});
+</script>
+
+</body>
+</html>

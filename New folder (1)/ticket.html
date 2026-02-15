@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ticket Confirmed | MyTicketSpot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- QR Code Generator Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #E23744;
+      --primary-hover: #d0303d;
+      --surface: #ffffff;
+      --background: #f1f5f9;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text-main);
+    }
+
+    /* Success Animation Wrapper */
+    .success-header {
+      text-align: center;
+      margin-bottom: 25px;
+      animation: fadeInDown 0.6s ease-out;
+    }
+
+    .checkmark-circle {
+      width: 60px;
+      height: 60px;
+      background: var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px auto;
+      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .checkmark-circle i { color: white; font-size: 30px; }
+
+    h2 { font-size: 1.5rem; color: var(--text-main); margin-bottom: 5px; }
+    .sub-text { color: var(--text-muted); font-size: 0.9rem; transition: color 0.3s ease; }
+
+    /* The Ticket Card */
+    .ticket-container {
+      background: var(--surface);
+      width: 100%;
+      max-width: 420px;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      position: relative;
+      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Ticket Header */
+    .ticket-header {
+      background: var(--primary);
+      padding: 20px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .ticket-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+    
+    .ticket-header::after {
+      content: '';
+      position: absolute;
+      bottom: -50%;
+      left: -30%;
+      width: 120px;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+    }
+    
+    .ticket-header h3 { 
+      font-size: 1.2rem; 
+      font-weight: 700; 
+      margin-bottom: 5px; 
+      position: relative;
+      z-index: 2;
+    }
+    .ticket-header span { 
+      font-size: 0.85rem; 
+      opacity: 0.9; 
+      position: relative;
+      z-index: 2;
+    }
+    
+    .event-icon {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 10px;
+    }
+
+    /* Ticket Body */
+    .ticket-body { 
+      padding: 25px; 
+      position: relative;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      align-items: flex-start;
+    }
+    
+    .info-label { 
+      font-size: 0.75rem; 
+      color: var(--text-muted); 
+      text-transform: uppercase; 
+      font-weight: 600; 
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .info-value { 
+      font-size: 0.95rem; 
+      font-weight: 600; 
+      color: var(--text-main); 
+      text-align: right;
+      max-width: 60%;
+      word-break: break-word;
+    }
+    
+    .info-group { 
+      text-align: left; 
+      flex: 1;
+    }
+    
+    .info-group.right { 
+      text-align: right; 
+      flex: 1;
+    }
+
+    /* The "Perforation" Line */
+    .ticket-divider {
+      position: relative;
+      height: 20px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .ticket-divider::before, .ticket-divider::after {
+      content: '';
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      background-color: #e2e8f0;
+      border-radius: 50%;
+      top: 0;
+    }
+    .ticket-divider::before { left: -10px; }
+    .ticket-divider::after { right: -10px; }
+    
+    .dashed-line {
+      width: 85%;
+      border-bottom: 2px dashed #cbd5e1;
+    }
+
+    /* QR Section */
+    .ticket-footer {
+      padding: 25px;
+      text-align: center;
+      background: var(--surface);
+    }
+    
+    .qr-code {
+      background: white;
+      padding: 10px;
+      border-radius: 12px;
+      display: inline-block;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      width: 170px;
+      height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+    
+    .ticket-id { 
+      font-family: monospace; 
+      color: var(--text-muted); 
+      margin-top: 15px; 
+      letter-spacing: 1px; 
+      font-size: 0.9rem;
+      background: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    /* Buttons */
+    .action-buttons {
+      width: 100%;
+      max-width: 420px;
+      margin-top: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(226, 55, 68, 0.2);
+    }
+    
+    .btn-primary:hover { 
+      transform: translateY(-2px); 
+      background: var(--primary-hover); 
+      box-shadow: 0 6px 20px rgba(226, 55, 68, 0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 2px solid #cbd5e1;
+    }
+    
+    .btn-secondary:hover { 
+      border-color: var(--primary); 
+      color: var(--primary); 
+      background: rgba(226, 55, 68, 0.05);
+    }
+
+    /* Additional Info */
+    .additional-info {
+      background: #ffebee;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 15px;
+      border: 1px solid #ffcdd2;
+    }
+    
+    .additional-info h4 {
+      font-size: 0.9rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .additional-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Loading State */
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-muted);
+    }
+    
+    .loading i {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    /* Seat Categories */
+    .seat-categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .seat-category {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      color: #166534;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes fadeInDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .ticket-container {
+        max-width: 100%;
+      }
+      
+      .action-buttons {
+        max-width: 100%;
+      }
+      
+      .info-value {
+        font-size: 0.9rem;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="success-header">
+    <div class="checkmark-circle">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <h2>Booking Confirmed!</h2>
+    <p class="sub-text" id="emailStatus">Your ticket has been booked successfully!</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading" id="loadingTicket">
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <p>Preparing your ticket...</p>
+  </div>
+
+  <!-- Ticket Container (initially hidden) -->
+  <div class="ticket-container" id="ticketContainer" style="display: none;">
+    <div class="ticket-header">
+      <div class="event-icon">
+        <i class="fa-solid fa-ticket fa-2x"></i>
+      </div>
+      <h3 id="eventDisplay">Event Ticket</h3>
+      <span id="ticketType">Digital E-Ticket</span>
+    </div>
+
+    <div class="ticket-body">
+      <!-- Row 1: Name and Date -->
+      <div class="info-row">
+        <div class="info-group">
+          <div class="info-label">
+            <i class="fa-solid fa-user"></i> Guest
+          </div>
+          <div class="info-value" id="nameDisplay">--</div>
+        </div>
+        <div class="info-group right">
+          <div class="info-label">
+            <i class="fa-solid fa-calendar"></i> Date
+          </div>
+          <div class="info-value" id="dateDisplay">--</div>
+        </div>
+      </div>
+      
+      <!-- Row 2: Venue and Time -->
+      <div class="info-row">
+        <div class="info-group">
+          <div class="info-label">
+            <i class="fa-solid fa-location-dot"></i> Venue
+          </div>
+          <div class="info-value" id="venueDisplay">--</div>
+        </div>
+        <div class="info-group right">
+          <div class="info-label">
+            <i class="fa-solid fa-clock"></i> Time
+          </div>
+          <div class="info-value" id="timeDisplay">--</div>
+        </div>
+      </div>
+      
+      <!-- Row 3: Seats and Price -->
+      <div class="info-row">
+        <div class="info-group">
+          <div class="info-label">
+            <i class="fa-solid fa-chair"></i> Seats
+          </div>
+          <div class="info-value" id="seatDisplay">--</div>
+        </div>
+        <div class="info-group right">
+          <div class="info-label">
+            <i class="fa-solid fa-indian-rupee-sign"></i> Total
+          </div>
+          <div class="info-value" id="priceDisplay">₹0</div>
+        </div>
+      </div>
+      
+      <!-- Seat Categories -->
+      <div id="seatCategories">
+        <!-- Seat categories will be inserted here -->
+      </div>
+      
+      <!-- Additional Info for Event -->
+      <div class="additional-info">
+        <h4><i class="fa-solid fa-circle-info"></i> Important Information</h4>
+        <p>
+          • Please arrive 30 minutes before showtime<br>
+          • Valid ID required for entry<br>
+          • No refunds or exchanges<br>
+          • Please keep this ticket for entry verification
+        </p>
+      </div>
+    </div>
+
+    <div class="ticket-divider">
+      <div class="dashed-line"></div>
+    </div>
+
+    <div class="ticket-footer">
+      <div class="qr-code" id="qrCode">
+        <!-- Real QR code will be generated here -->
+      </div>
+      <div class="ticket-id">
+        Booking ID: <span id="idDisplay">...</span>
+      </div>
+      <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+        Scan at entrance • Valid until showtime
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons" id="actionButtons" style="display: none;">
+    <button class="btn btn-primary" onclick="downloadTicket()">
+      <i class="fa-solid fa-download"></i> Download Ticket
+    </button>
+    <button class="btn btn-secondary" onclick="goHome()">
+      <i class="fa-solid fa-home"></i> Back to Home
+    </button>
+    <button class="btn btn-secondary" onclick="viewBookings()">
+      <i class="fa-solid fa-ticket"></i> View My Bookings
+    </button>
+  </div>
+
+<script>
+// Function to get URL parameter
+function getQueryParam(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
+// Function to load booking details from localStorage
+function loadBookingDetails() {
+  try {
+    // First try to get from completedBooking (set by payment page)
+    const completedBooking = JSON.parse(localStorage.getItem('completedBooking'));
+    if (completedBooking) {
+      return completedBooking;
+    }
+    
+    // Then try from currentBooking
+    const currentBooking = JSON.parse(localStorage.getItem('currentBooking'));
+    if (currentBooking) {
+      return currentBooking;
+    }
+    
+    // Then try from selectedEvent
+    const selectedEvent = JSON.parse(localStorage.getItem('selectedEvent'));
+    if (selectedEvent) {
+      return selectedEvent;
+    }
+    
+    // If nothing found, check for bookingId in URL
+    const bookingId = getQueryParam('bookingId');
+    if (bookingId) {
+      const bookingHistory = JSON.parse(localStorage.getItem('bookingHistory') || '[]');
+      const booking = bookingHistory.find(b => b.bookingId === bookingId);
+      if (booking) {
+        return booking;
+      }
+    }
+    
+    // Return demo data if nothing found
+    return getDemoTicketData();
+    
+  } catch (error) {
+    console.error("Error loading booking details:", error);
+    return getDemoTicketData();
+  }
+}
+
+// Function to get demo ticket data (fallback)
+function getDemoTicketData() {
+  return {
+    bookingId: 'MTS-DEMO-' + Date.now().toString().slice(-6),
+    show: {
+      title: "Kisi Ko Batana Mat By Anubhav Singh Bassi",
+      date: "Fri 13 Mar 2026",
+      time: "7:00 PM",
+      venue: "Tatkata Stadium, Delhi"
+    },
+    guestDetails: {
+      name: "Guest User",
+      email: "guest@example.com",
+      phone: "+91 00000 00000"
+    },
+    seats: ["A1", "A2"],
+    seatDetails: [
+      { id: "A1", categoryName: "Premium", price: 999 },
+      { id: "A2", categoryName: "Premium", price: 999 }
+    ],
+    finalTotal: 2198,
+    bookingTime: new Date().toISOString(),
+    paymentMethod: "UPI"
+  };
+}
+
+// Function to format date
+function formatDate(dateString) {
+  if (!dateString) {
+    const today = new Date();
+    return today.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      day: 'numeric', 
+      month: 'short', 
+      year: 'numeric' 
+    });
+  }
+  
+  // Try to parse the date string
+  try {
+    // Check if it's already in the right format
+    if (dateString.includes(',')) {
+      return dateString;
+    }
+    
+    // Try to parse as ISO string
+    const date = new Date(dateString);
+    if (!isNaN(date.getTime())) {
+      return date.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric' 
+      });
+    }
+    
+    return dateString;
+  } catch (e) {
+    return dateString;
+  }
+}
+
+// Function to format price with Indian Rupee symbol
+function formatPrice(price) {
+  return '₹' + parseInt(price).toLocaleString('en-IN');
+}
+
+// Function to generate QR code text for ticket
+function generateQRCodeText(bookingData) {
+  // Create a compact representation of essential info
+  const qrData = {
+    id: bookingData.bookingId,
+    name: bookingData.guestDetails?.name || "Guest",
+    event: bookingData.show?.title || bookingData.eventTitle || "Event",
+    venue: bookingData.show?.venue || bookingData.venue || "Venue",
+    date: bookingData.show?.date || bookingData.eventDate || formatDate(new Date()),
+    time: bookingData.show?.time || bookingData.eventTime || "7:00 PM",
+    seats: bookingData.seats?.join(', ') || "General",
+    price: bookingData.finalTotal || 0
+  };
+  
+  return JSON.stringify(qrData);
+}
+
+// Function to create a real QR code using qrcode-generator library
+function createRealQRCode(qrData) {
+  const qrCodeDiv = document.getElementById('qrCode');
+  qrCodeDiv.innerHTML = ''; // Clear previous content
+
+  try {
+    // Generate QR code
+    const qr = qrcode(0, 'M'); // Type number 0 (auto-select), error correction level M
+    qr.addData(qrData);
+    qr.make();
+
+    // Get the matrix and create an HTML table
+    const size = qr.getModuleCount();
+    const cellSize = 3; // pixels per module – adjust to fit 170px container
+    const qrTable = document.createElement('table');
+    qrTable.style.margin = '0 auto';
+    qrTable.style.borderCollapse = 'collapse';
+
+    for (let row = 0; row < size; row++) {
+      const tr = document.createElement('tr');
+      tr.style.height = cellSize + 'px';
+      for (let col = 0; col < size; col++) {
+        const td = document.createElement('td');
+        td.style.width = cellSize + 'px';
+        td.style.height = cellSize + 'px';
+        td.style.padding = '0';
+        if (qr.isDark(row, col)) {
+          td.style.backgroundColor = '#000'; // dark module
+        } else {
+          td.style.backgroundColor = '#fff'; // light module
+        }
+        tr.appendChild(td);
+      }
+      qrTable.appendChild(tr);
+    }
+
+    qrCodeDiv.appendChild(qrTable);
+  } catch (e) {
+    console.error("QR generation failed:", e);
+    // Fallback to simple display
+    qrCodeDiv.innerHTML = '<div style="font-size:0.8rem; color:#666;">QR Error<br>Use ID</div>';
+  }
+}
+
+// Function to generate seat categories HTML
+function generateSeatCategories(seatDetails) {
+  if (!seatDetails || seatDetails.length === 0) return '';
+  
+  // Count seats by category
+  const categoryCounts = {};
+  seatDetails.forEach(seat => {
+    if (!categoryCounts[seat.categoryName]) {
+      categoryCounts[seat.categoryName] = 0;
+    }
+    categoryCounts[seat.categoryName]++;
+  });
+  
+  // Generate HTML for each category
+  let html = '<div class="seat-categories">';
+  Object.entries(categoryCounts).forEach(([category, count]) => {
+    html += `
+      <div class="seat-category">
+        <i class="fa-solid fa-chair"></i>
+        <span>${category} × ${count}</span>
+      </div>
+    `;
+  });
+  html += '</div>';
+  
+  return html;
+}
+
+// Main initialization
+window.addEventListener('load', async function() {
+  try {
+    // Load booking details
+    const bookingData = loadBookingDetails();
+    
+    if (!bookingData) {
+      throw new Error("No booking data found");
+    }
+    
+    // Extract data for display
+    const eventTitle = bookingData.show?.title || bookingData.eventTitle || "Event Ticket";
+    const guestName = bookingData.guestDetails?.name || "Guest User";
+    const venue = bookingData.show?.venue || bookingData.venue || "Venue";
+    const date = bookingData.show?.date || bookingData.eventDate || formatDate(new Date());
+    const time = bookingData.show?.time || bookingData.eventTime || "7:00 PM";
+    const seats = bookingData.seats?.join(', ') || "Not specified";
+    const totalPrice = bookingData.finalTotal || bookingData.totalAmount || 0;
+    const bookingId = bookingData.bookingId || 'MTS-' + Date.now();
+    
+    // Update UI with booking details
+    document.getElementById("eventDisplay").textContent = eventTitle;
+    document.getElementById("nameDisplay").textContent = guestName;
+    document.getElementById("idDisplay").textContent = bookingId;
+    document.getElementById("dateDisplay").textContent = formatDate(date);
+    document.getElementById("venueDisplay").textContent = venue;
+    document.getElementById("timeDisplay").textContent = time;
+    document.getElementById("seatDisplay").textContent = seats;
+    document.getElementById("priceDisplay").textContent = formatPrice(totalPrice);
+    
+    // Set ticket type based on event
+    const eventType = bookingData.show?.type || bookingData.type || "comedy";
+    const ticketTypeText = eventType === 'comedy' ? 'Comedy Show Ticket' : 'Event Ticket';
+    document.getElementById("ticketType").textContent = ticketTypeText;
+    
+    // Update event icon based on type
+    const eventIcon = document.querySelector('.event-icon i');
+    if (eventType === 'comedy') {
+      eventIcon.className = 'fa-solid fa-face-laugh fa-2x';
+    } else if (eventType === 'movie') {
+      eventIcon.className = 'fa-solid fa-film fa-2x';
+    } else {
+      eventIcon.className = 'fa-solid fa-ticket fa-2x';
+    }
+    
+    // Generate and display seat categories
+    const seatCategoriesDiv = document.getElementById('seatCategories');
+    if (bookingData.seatDetails && bookingData.seatDetails.length > 0) {
+      seatCategoriesDiv.innerHTML = generateSeatCategories(bookingData.seatDetails);
+    }
+    
+    // Generate real QR code
+    const qrData = generateQRCodeText(bookingData);
+    createRealQRCode(qrData);
+    
+    // Hide loading, show ticket and buttons
+    document.getElementById("loadingTicket").style.display = 'none';
+    document.getElementById("ticketContainer").style.display = 'block';
+    document.getElementById("actionButtons").style.display = 'flex';
+    
+    // Update email status
+    const userEmail = bookingData.guestDetails?.email || "your email";
+    const emailStatus = document.getElementById("emailStatus");
+    emailStatus.innerHTML = `Confirmation sent to <strong>${userEmail}</strong>`;
+    
+    // Send email confirmation (simulated)
+    await sendEmailConfirmation(bookingData);
+    
+  } catch (error) {
+    console.error("Error loading ticket:", error);
+    
+    // Show error state
+    document.getElementById("loadingTicket").innerHTML = `
+      <i class="fa-solid fa-exclamation-triangle" style="color: var(--danger);"></i>
+      <p>Unable to load ticket. Showing demo ticket.</p>
+    `;
+    
+    // Load demo data
+    setTimeout(() => {
+      loadDemoTicket();
+    }, 1000);
+  }
+});
+
+// Function to load demo ticket
+function loadDemoTicket() {
+  const demoData = getDemoTicketData();
+  
+  document.getElementById("eventDisplay").textContent = demoData.show.title;
+  document.getElementById("nameDisplay").textContent = demoData.guestDetails.name;
+  document.getElementById("idDisplay").textContent = demoData.bookingId;
+  document.getElementById("dateDisplay").textContent = formatDate(demoData.show.date);
+  document.getElementById("venueDisplay").textContent = demoData.show.venue;
+  document.getElementById("timeDisplay").textContent = demoData.show.time;
+  document.getElementById("seatDisplay").textContent = demoData.seats.join(', ');
+  document.getElementById("priceDisplay").textContent = formatPrice(demoData.finalTotal);
+  
+  // Generate seat categories
+  const seatCategoriesDiv = document.getElementById('seatCategories');
+  seatCategoriesDiv.innerHTML = generateSeatCategories(demoData.seatDetails);
+  
+  // Generate real QR code for demo
+  const qrData = generateQRCodeText(demoData);
+  createRealQRCode(qrData);
+  
+  // Hide loading, show ticket and buttons
+  document.getElementById("loadingTicket").style.display = 'none';
+  document.getElementById("ticketContainer").style.display = 'block';
+  document.getElementById("actionButtons").style.display = 'flex';
+}
+
+// Function to send email confirmation (simulated)
+async function sendEmailConfirmation(bookingData) {
+  const emailStatus = document.getElementById("emailStatus");
+  const userEmail = bookingData.guestDetails?.email || "your email";
+  
+  try {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Update status
+    emailStatus.innerHTML = `Confirmation sent to <strong>${userEmail}</strong> <i class="fa-solid fa-check" style="color:var(--success)"></i>`;
+    
+    // Save email history
+    const emailHistory = JSON.parse(localStorage.getItem('emailHistory') || '[]');
+    emailHistory.push({
+      bookingId: bookingData.bookingId,
+      email: userEmail,
+      sentAt: new Date().toISOString(),
+      event: bookingData.show?.title || "Event"
+    });
+    localStorage.setItem('emailHistory', JSON.stringify(emailHistory));
+    
+  } catch (error) {
+    console.error("Email send failed:", error);
+    emailStatus.innerHTML = `Confirmation will be sent to <strong>${userEmail}</strong>`;
+    emailStatus.style.color = "var(--text-muted)";
+  }
+}
+
+// Action Functions
+function downloadTicket() {
+  const btn = document.querySelector('.btn-primary');
+  const originalHTML = btn.innerHTML;
+  const originalBg = btn.style.background;
+  
+  btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Generating PDF...';
+  btn.disabled = true;
+  
+  // Get booking data for filename
+  const bookingData = loadBookingDetails();
+  const eventTitle = bookingData.show?.title || bookingData.eventTitle || "Ticket";
+  const fileName = `Ticket_${bookingData.bookingId}_${eventTitle.replace(/\s+/g, '_')}.pdf`;
+  
+  // Simulate PDF generation and download
+  setTimeout(() => {
+    // Create ticket content for PDF
+    const ticketContent = `
+      ==================================
+      MYTICKETSPOT - TICKET CONFIRMATION
+      ==================================
+      
+      Booking ID: ${bookingData.bookingId}
+      Event: ${eventTitle}
+      Guest: ${bookingData.guestDetails?.name || "Guest User"}
+      Venue: ${bookingData.show?.venue || bookingData.venue}
+      Date: ${formatDate(bookingData.show?.date || bookingData.eventDate)}
+      Time: ${bookingData.show?.time || bookingData.eventTime}
+      Seats: ${bookingData.seats?.join(', ') || "General"}
+      Total Paid: ${formatPrice(bookingData.finalTotal || 0)}
+      
+      ----------------------------------
+      IMPORTANT INFORMATION:
+      • Please arrive 30 minutes before showtime
+      • Valid ID required for entry
+      • Present this ticket at the entrance
+      • No refunds or exchanges
+      
+      Thank you for booking with MyTicketSpot!
+      ==================================
+    `;
+    
+    // Create and trigger download
+    const blob = new Blob([ticketContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    // Update button to show success
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Downloaded!';
+    btn.style.background = 'var(--success)';
+    
+    // Revert button after 3 seconds
+    setTimeout(() => {
+      btn.innerHTML = originalHTML;
+      btn.style.background = originalBg;
+      btn.disabled = false;
+    }, 3000);
+    
+  }, 1500);
+}
+
+function goHome() {
+  // Clear temporary data but keep booking history
+  localStorage.removeItem("currentBooking");
+  localStorage.removeItem("selectedEvent");
+  
+  // Redirect to home
+  window.location.href = "index.html";
+}
+
+function viewBookings() {
+  // Save current booking to history if not already there
+  const bookingData = loadBookingDetails();
+  const bookingHistory = JSON.parse(localStorage.getItem('bookingHistory') || '[]');
+  
+  // Check if already in history
+  const exists = bookingHistory.some(booking => booking.bookingId === bookingData.bookingId);
+  if (!exists && bookingData.bookingId !== 'MTS-DEMO') {
+    bookingHistory.push({
+      ...bookingData,
+      bookingDate: new Date().toISOString()
+    });
+    localStorage.setItem('bookingHistory', JSON.stringify(bookingHistory));
+  }
+  
+  // Show booking count and redirect
+  if (bookingHistory.length > 0) {
+    alert(`You have ${bookingHistory.length} booking(s) in your history.`);
+  } else {
+    alert("No booking history found.");
+  }
+  
+  // Redirect to bookings page or home
+  window.location.href = "index.html"; // You can change this to "bookings.html" if you have one
+}
+
+// Add hover animation to ticket
+document.addEventListener('DOMContentLoaded', function() {
+  const ticket = document.getElementById('ticketContainer');
+  if (ticket) {
+    ticket.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-5px)';
+      this.style.boxShadow = '0 35px 60px -15px rgba(0, 0, 0, 0.2)';
+    });
+    
+    ticket.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.15)';
+    });
+  }
+});
+
+// Add to booking history when page loads
+window.addEventListener('load', function() {
+  const bookingData = loadBookingDetails();
+  if (bookingData && bookingData.bookingId && bookingData.bookingId !== 'MTS-DEMO') {
+    // Add to booking history if not already there
+    const bookingHistory = JSON.parse(localStorage.getItem('bookingHistory') || '[]');
+    const exists = bookingHistory.some(booking => booking.bookingId === bookingData.bookingId);
+    
+    if (!exists) {
+      bookingHistory.push({
+        ...bookingData,
+        bookingDate: new Date().toISOString(),
+        ticketType: 'E-Ticket'
+      });
+      localStorage.setItem('bookingHistory', JSON.stringify(bookingHistory));
+    }
+  }
+});
+</script>
+
+</body>
+</html>
