@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About Us | MyTicketSpot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: #f8fafc; color: #1e293b; }
+    .about-hero {
+      background: linear-gradient(rgba(31, 41, 55, 0.8), rgba(31, 41, 55, 0.8)), url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80');
+      background-size: cover; background-position: center; color: white; padding: 100px 5%; text-align: center;
+    }
+    .about-section { background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-bottom: 40px; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
+    .feature-box { background: #f1f5f9; padding: 30px; border-radius: 15px; text-align: center; transition: 0.3s; }
+    .feature-box:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .feature-box i { font-size: 2.5rem; color: #4f46e5; margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo"><i class="fa-solid fa-ticket"></i> MyTicketSpot</div>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="events.html">Events</a>
+    <a href="about.html" class="active">About</a>
+    <a href="contactus.html">Contact</a>
+    <a href="login.html">Login</a>
+  </nav>
+</header>
+
+<section class="about-hero">
+  <h1 style="font-size: 3rem; font-weight: 700;">Our Story</h1>
+  <p style="font-size: 1.2rem; opacity: 0.9;">Redefining how you experience live events.</p>
+</section>
+
+<div class="container" style="max-width: 1100px; margin: -50px auto 50px; padding: 0 20px;">
+  <div class="about-section">
+    <h3 style="color: #4f46e5; margin-bottom: 15px;">Who We Are</h3>
+    <p><b>MyTicketSpot</b> is a modern ticket booking platform designed to make booking movies, live events, travel, and activities simple, fast, and reliable. We connect users with unforgettable experiences through a seamless digital platform.</p>
+    <p style="margin-top:15px;">Whether you are booking a movie night, a concert, or a weekend getaway, MyTickitSpot ensures a smooth and secure booking experience.</p>
+  </div>
+
+  <div class="about-section" style="background: #1f2937; color: white;">
+    <h3>Our Mission</h3>
+    <p style="opacity: 0.9;">Our mission is to simplify ticket booking by offering a user-friendly, transparent, and technology-driven platform that benefits customers, event organizers, and partners alike.</p>
+  </div>
+
+  <div class="about-section">
+    <h3 style="text-align: center; margin-bottom: 30px;">Why Choose MyTickitSpot?</h3>
+    <div class="features">
+      <div class="feature-box">
+        <i class="fa-solid fa-bolt"></i>
+        <h4>Easy Booking</h4>
+        <p>Book tickets in just a few clicks with our optimized interface.</p>
+      </div>
+      <div class="feature-box">
+        <i class="fa-solid fa-shield-halved"></i>
+        <h4>Secure Payments</h4>
+        <p>Your transactions are protected with industry-standard encryption.</p>
+      </div>
+      <div class="feature-box">
+        <i class="fa-solid fa-mobile-screen"></i>
+        <h4>Mobile Friendly</h4>
+        <p>A flawless experience on every device, from phone to desktop.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-section" style="border-left: 5px solid #4f46e5;">
+    <h3>Our Technology Partner</h3>
+    <p>MyTicketSpot is developed and maintained by <b>ReadyHand Artificial Intelligence Technology & Infynex Groups</b>, focusing on scalable, secure, and intelligent digital solutions.</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-bottom">© 2026 MyTicketSpot | <a href="https://rhaitech.online" target="_blank" style="color:#c7d2fe;">rhaitech.online</a></div>
+</footer>
+
+</body>
+</html>
